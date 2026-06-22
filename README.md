@@ -6,7 +6,7 @@
 
   <h1>Intent Completeness Checker</h1>
   <p>
-    <b>A Multi-Agent AI Pipeline for Code Verification</b><br />
+    <b>A Multi-Agent AI Pipeline for Code Verification (Powered by <a href="https://github.com/agno-ai/agno">Agno Framework</a>)</b><br />
     Ensure your AI coding assistants finish what they started. No more half-finished refactors.
   </p>
 </div>
@@ -71,7 +71,7 @@ flowchart TD
 ### Prerequisites
 - **Python 3.11** or higher
 - **Git** (The tool relies on Git to analyze repository changes)
-- An API Key from an LLM provider (Default is **Groq** for extreme speed)
+- An API Key from an LLM provider (e.g., OpenAI, Anthropic, or Groq)
 
 ### Installation
 
@@ -131,14 +131,14 @@ repos:
 
 ## 🛠 Configuration
 
-By default, the application uses **Groq** (`llama-3.3-70b-versatile`) for blazing-fast inference.
+The tool is provider-agnostic and **requires** you to specify which LLM provider and model you want to use.
 
 ### Environment Variables
-Copy `.env.example` to `.env` and configure your API keys:
+Copy `.env.example` to `.env` and configure your API keys and provider:
 ```bash
-LLM_PROVIDER=groq
-LLM_MODEL_ID=llama-3.3-70b-versatile
-GROQ_API_KEY="gsk_..."
+LLM_PROVIDER=openai
+LLM_MODEL_ID=gpt-4o
+OPENAI_API_KEY="sk-..."
 ```
 
 ### Using Alternative LLM Providers

@@ -11,8 +11,8 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
-    llm_provider: str = "groq"
-    llm_model_id: str = "llama-3.3-70b-versatile"
+    llm_provider: str
+    llm_model_id: str
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
