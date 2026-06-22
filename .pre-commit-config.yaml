@@ -1,0 +1,10 @@
+repos:
+-   repo: local
+    hooks:
+    -   id: intentcheck
+        name: Intent Completeness Checker
+        description: Checks that the intended code modifications were applied completely.
+        entry: intentcheck --intent "Verify that all intended modifications are present" --full-pipeline
+        language: system
+        types: [text]
+        pass_filenames: false

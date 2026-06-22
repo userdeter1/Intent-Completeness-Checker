@@ -1,0 +1,7 @@
+-   id: intentcheck
+    name: Intent Completeness Checker
+    description: Checks that the intended code modifications were applied completely.
+    entry: intentcheck --intent "Review the code changes to ensure completeness." --full-pipeline
+    language: python
+    types: [text]
+    pass_filenames: false
