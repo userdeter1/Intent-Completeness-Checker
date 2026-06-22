@@ -131,43 +131,46 @@ def test_ensure_unique_ids_preserves_already_unique_ids():
     assert fixed.assertions[0].id == "check-api-key"
     assert fixed.assertions[1].id == "verify-config"
 
-@patch('intentcheck.agents.investigator.Agent')
-@patch('intentcheck.agents.investigator.resolve_model')
+
+@patch("intentcheck.agents.investigator.Agent")
+@patch("intentcheck.agents.investigator.resolve_model")
 def test_investigate_intent_retry_success(mock_resolve_model, mock_agent_class):
     mock_agent_instance = MagicMock()
     mock_agent_class.return_value = mock_agent_instance
 
     mock_response = MagicMock()
     mock_content = InvestigatorOutput(
-        intent=Intent(text='test', source='user_provided'),
+        intent=Intent(text="test", source="user_provided"),
         assertions=[],
     )
     mock_response.content = mock_content
 
     # Simulate a failure on the first call, success on the second
     mock_agent_instance.run = MagicMock(
-        side_effect=[Exception('tool_use_failed'), mock_response]
+        side_effect=[Exception("tool_use_failed"), mock_response]
     )
 
-    intent = Intent(text='test', source='user_provided')
+    intent = Intent(text="test", source="user_provided")
     output = investigate_intent(intent)
 
     assert mock_agent_instance.run.call_count == 2
-    assert output.intent.text == 'test'
+    assert output.intent.text == "test"
 
-@patch('intentcheck.agents.investigator.Agent')
-@patch('intentcheck.agents.investigator.resolve_model')
+
+@patch("intentcheck.agents.investigator.Agent")
+@patch("intentcheck.agents.investigator.resolve_model")
 def test_investigate_intent_retry_failure(mock_resolve_model, mock_agent_class):
     mock_agent_instance = MagicMock()
     mock_agent_class.return_value = mock_agent_instance
 
     # Simulate persistent failure
-    mock_agent_instance.run = MagicMock(side_effect=Exception('persistent failure'))
+    mock_agent_instance.run = MagicMock(side_effect=Exception("persistent failure"))
 
-    intent = Intent(text='test', source='user_provided')
+    intent = Intent(text="test", source="user_provided")
 
     import pytest
-    with pytest.raises(ValueError, match='Investigator failed after 3 attempts'):
+
+    with pytest.raises(ValueError, match="Investigator failed after 3 attempts"):
         investigate_intent(intent)
 
     assert mock_agent_instance.run.call_count == 3
