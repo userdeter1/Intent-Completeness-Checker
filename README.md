@@ -1,24 +1,26 @@
 # Intent Completeness Checker
 
-A multi-agent pipeline that verifies if an AI coding agent actually completed its intended changes across the entire repository, preventing half-finished refactors.
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-## Why
+A multi-agent AI pipeline that verifies if an intended code modification was applied **completely** across an entire repository, preventing half-finished refactors and forgotten updates.
 
-AI coding assistants (like Claude Code, Cursor, or Aider) are incredible at writing code, but they frequently suffer from "tunnel vision." When asked to perform a repository-wide change—like renaming an environment variable or migrating an API endpoint—they will perfectly update the main source files, but frequently forget to update documentation, Makefiles, CI scripts, or obscure tests.
+## 💡 Why this exists
 
-The worst part? If you ask the same agent "Did you update everything?", it will read its own recent changes, hallucinate completeness, and confidently answer "Yes." It lies to you because it assumes its own plan was perfectly executed.
+AI coding assistants (like Cursor, Copilot, or Aider) are incredible at writing code, but they frequently suffer from "tunnel vision." When asked to perform a repository-wide change—like renaming an environment variable or migrating an API endpoint—they will perfectly update the main source files, but frequently forget to update documentation, Makefiles, CI scripts, or obscure tests.
 
-To solve this, you need an independent verification system. The Intent Completeness Checker takes the original intent and the current state of the repo, breaks the intent down into precise assertions, and actively hunts for evidence of missed updates.
+The worst part? If you ask the agent "Did you update everything?", it will read its own recent changes, hallucinate completeness, and confidently answer "Yes." It assumes its own plan was perfectly executed.
 
-## How it works
+To solve this, you need an **independent verification system**. The Intent Completeness Checker takes the original intent and the current state of the repo, breaks the intent down into precise assertions, and actively hunts for evidence of missed updates.
 
-The pipeline uses four distinct components to ensure objective verification:
+## ⚙️ How it works
+
+The pipeline uses four distinct components (via the [Agno](https://github.com/agno-ai/agno) framework) to ensure objective verification:
 - **Investigator**: Reads the original intent (or infers it from the current git diff) and breaks it down into a list of specific, testable assertions.
-- **Searcher**: For each assertion, autonomously navigates the codebase using ripgrep to find any code, docs, or config that might violate it.
-- **Judge**: Examines the Searcher's findings to determine if they are actual violations (missed updates) or just false positives (dead code, unrelated terms).
+- **Searcher**: For each assertion, autonomously navigates the codebase using `ripgrep` to find any code, docs, or config that might violate it.
+- **Judge**: Examines the Searcher's findings to determine if they are actual violations (missed updates) or just false positives.
 - **Orchestrator**: Runs the Searchers and Judges concurrently for all assertions and aggregates the results into a final actionable report.
-
-Crucially, this pipeline acts as an **independent** reviewer. Because it didn't write the code, it has no bias to assume the work is complete.
 
 ```mermaid
 flowchart TD
@@ -36,62 +38,70 @@ flowchart TD
     Orch --> Report[Final Report]
 ```
 
-## Installation
+## 🚀 Installation
 
-You will need a `GROQ_API_KEY` to run the LLMs. You can set it as an environment variable or via a `.env` file (see `.env.example`).
+You will need a `GROQ_API_KEY` to run the default LLM (`llama-3.3-70b-versatile`). You can set it as an environment variable or via a `.env` file (copy `.env.example` to `.env`).
 
-### Via `uv` (Recommended)
+### 1. Via PyPI (Global Install)
+*(Coming soon to PyPI)*
 ```bash
+pip install intent-completeness-checker
+```
+
+### 2. Via `uv` (Recommended for Local Dev)
+```bash
+git clone https://github.com/userdeter1/Intent-Completeness-Checker.git
+cd Intent-Completeness-Checker
 uv sync
 ```
 
-### Via `pip` standard
-```bash
-pip install -e ".[dev]"
+### 3. As a Pre-commit Hook (Best for Teams)
+You can enforce completeness checks automatically before every commit. Add this to your `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+-   repo: https://github.com/userdeter1/Intent-Completeness-Checker
+    rev: main  # Replace with a specific tag once published
+    hooks:
+    -   id: intentcheck
 ```
 
-## Usage
+*Note: You must have `GROQ_API_KEY` exported in your terminal environment for the pre-commit hook to function.*
 
-Here are some common ways to use the tool, from simple investigation to full pipeline verification.
+## 💻 Usage
 
-1. **Just break down an intent into assertions (no search):**
-```bash
-intentcheck investigate --intent "Rename 'src' to 'lib'"
-```
+The CLI (`intentcheck`) offers several modes, from simple investigation to full pipeline verification.
 
-2. **Run the full pipeline with a specific intent:**
-```bash
-intentcheck investigate --intent "Rename 'src' to 'lib'" --full-pipeline
-```
-
-3. **Run the full pipeline based on the current git diff:**
+### Check current Git Diff automatically
+If you run the pipeline without an intent, it will read your current uncommitted `git diff`, figure out what you were trying to do, and check if you missed anything!
 ```bash
 intentcheck investigate --full-pipeline
 ```
 
-4. **Output as JSON for CI integration:**
+### Check a specific Intent
+```bash
+intentcheck investigate --intent "Rename 'src' to 'lib' everywhere" --full-pipeline
+```
+
+### Output as JSON for CI/CD integrations
 ```bash
 intentcheck investigate --full-pipeline --json > report.json
 ```
 
-### Using a different LLM provider
+### Changing the AI Provider
 
-By default, the application uses Groq (`llama-3.3-70b-versatile`). You can change the provider and model using the `--provider` and `--model` CLI arguments, or via environment variables (`LLM_PROVIDER`, `LLM_MODEL_ID`).
+By default, the application uses Groq. You can change the provider and model using `--provider` and `--model`, or via environment variables (`LLM_PROVIDER`, `LLM_MODEL_ID`).
 
-**Important**: If you change the provider, you must install the corresponding Python SDK yourself. The project does not include all provider SDKs by default to remain lightweight.
+*If you change the provider, you must install the corresponding SDK yourself (e.g., `pip install openai` for OpenAI).*
 
-For example:
-- **OpenAI**: `pip install openai` (requires `OPENAI_API_KEY`)
-- **Anthropic**: `pip install anthropic` (requires `ANTHROPIC_API_KEY`)
-
-Then you can run:
 ```bash
-intentcheck investigate --intent "Refactor tests" --provider openai --model gpt-4o
+export OPENAI_API_KEY="sk-..."
+intentcheck investigate --full-pipeline --provider openai --model gpt-4o
 ```
 
-### Example Terminal Output
+## 📊 Example Output
 
-```
+```text
 ╭──────────────────────── 🔍 Intent Completeness Report ─────────────────────────╮
 │ Intent: Rename 'src' to 'lib'                                                  │
 ╰────────────────────────────────────────────────────────────────────────────────╯
@@ -119,7 +129,7 @@ intentcheck investigate --intent "Refactor tests" --provider openai --model gpt-
 ╰────────────────────────────────────────────────────────────────────────────────╯
 ```
 
-## Exit Codes
+## 🛡 Exit Codes
 
 | Code | Meaning |
 |------|---------|
@@ -128,27 +138,12 @@ intentcheck investigate --intent "Refactor tests" --provider openai --model gpt-
 
 This makes it easy to use `intentcheck` as a strict pre-commit hook or as a blocking step in your CI/CD pipeline.
 
-## Architecture
-
-- **Investigator** (`agents/investigator.py`)
-- **Searcher** (`agents/searcher.py`)
-- **Judge** (`agents/judge.py`)
-- **Orchestrator** (`core/orchestrator.py`)
-
-**Tech Stack:** Python 3.11+, [Agno](https://github.com/agno-ai/agno) (agent framework), Groq/Llama models, Typer (CLI), Rich (terminal formatting), Pydantic v2 (structured outputs).
-
-## Known Limitations
-
-- **No Dedicated Semantic Detection:** It relies entirely on the LLM's reasoning combined with `ripgrep`. It does not build an AST or an embeddings database.
-- **Large Repository Performance:** Not yet optimized for massive monorepos (10,000+ files). The search strategy is fast, but context windows might struggle if the ripgrep output is huge.
-- **No GitHub Action Yet:** Must be run locally or invoked via custom shell scripts in CI.
-
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please ensure that:
 1. `ruff check .` passes without errors.
-2. `pytest` passes (requires `pytest-asyncio`, which is already included in both the `uv` and `pip` installation paths).
+2. `pytest` passes 100% of the test suite.
 
-## License
+## 📜 License
 
 MIT License
