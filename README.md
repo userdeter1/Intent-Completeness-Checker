@@ -13,7 +13,7 @@
 
 <br />
 
-## 📖 Table of Contents
+##  Table of Contents
 - [About The Project](#-about-the-project)
 - [How It Works](#-how-it-works)
 - [Getting Started](#-getting-started)
@@ -28,7 +28,7 @@
 
 ---
 
-## 🎯 About The Project
+##  About The Project
 
 AI coding assistants (like Cursor, GitHub Copilot, or Aider) are incredible at writing code, but they frequently suffer from **"tunnel vision"**. 
 
@@ -40,24 +40,24 @@ The worst part? If you ask the agent *"Did you update everything?"*, it will rea
 
 ---
 
-## ⚙️ How It Works
+##  How It Works
 
 This project leverages the [Agno](https://github.com/agno-ai/agno) framework to orchestrate four distinct AI agents:
 
-1. 🕵️ **Investigator**: Analyzes the original intent (or the current `git diff`) and breaks it down into a strict list of testable assertions.
-2. 🔍 **Searcher**: Autonomously navigates the codebase using `ripgrep` to hunt for missed code, docs, or config files.
-3. ⚖️ **Judge**: Examines the Searcher's findings to filter out false positives and determine if a true violation occurred.
-4. 🧠 **Orchestrator**: Manages concurrency, coordinates the agents, and generates a structured, actionable final report.
+1.  **Investigator**: Analyzes the original intent (or the current `git diff`) and breaks it down into a strict list of testable assertions.
+2.  **Searcher**: Autonomously navigates the codebase using `ripgrep` to hunt for missed code, docs, or config files.
+3.  **Judge**: Examines the Searcher's findings to filter out false positives and determine if a true violation occurred.
+4.  **Orchestrator**: Manages concurrency, coordinates the agents, and generates a structured, actionable final report.
 
 ```mermaid
 flowchart TD
     A[Intent / Git Diff] -->|Parsed by| B(🕵️ Investigator)
     B -->|Generates| C[List of Assertions]
     
-    C -->|Handled Concurrently| D(🔍 Searcher)
-    D -->|Evidence found| E(⚖️ Judge)
+    C -->|Handled Concurrently| D(Searcher)
+    D -->|Evidence found| E(Judge)
     
-    E -->|Verdict| F(🧠 Orchestrator)
+    E -->|Verdict| F(Orchestrator)
     F -->|Aggregates| G([Final Report / Exit Code])
 
     style A fill:#f9f,stroke:#333,stroke-width:2px
@@ -66,7 +66,7 @@ flowchart TD
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - **Python 3.11** or higher
@@ -89,7 +89,7 @@ pip install intent-completeness-checker
 
 ---
 
-## 💻 Usage
+##  Usage
 
 The Command Line Interface (`intentcheck`) is designed to be simple but extremely powerful.
 
@@ -111,6 +111,44 @@ For headless environments, get a clean JSON output instead of the visual termina
 intentcheck investigate --full-pipeline --json > report.json
 ```
 
+### 4. Example Output
+
+When the tool finishes analyzing your codebase, it prints a beautiful, easy-to-read report directly in your terminal:
+
+```text
+╭─────────────────────  Intent Completeness Report ──────────────────────╮
+│ Intent: Rename OLD_API_KEY to NEW_API_KEY everywhere.                    │
+╰──────────────────────────────────────────────────────────────────────────╯
+
+                          ✅ Assertions satisfied
+┏━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ ID ┃ Description                      ┃ Reasoning                        ┃
+┡━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ A1 │ OLD_API_KEY should no longer be  │ I searched for 'OLD_API_KEY' in  │
+│    │ used in the codebase.            │ the entire project and found 0   │
+│    │                                  │ occurrences. The rename was      │
+│    │                                  │ successfully applied.            │
+└────┴──────────────────────────────────┴──────────────────────────────────┘
+
+                                 ❌ Assertions violated                     
+┏━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━┓
+┃ ID ┃ Description       ┃ Verdict  ┃ Reasoning        ┃ Evidence           ┃
+┡━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━┩
+│ A2 │ NEW_API_KEY must  │ VIOLATED │ The get_key()    │ auth.py:42         │
+│    │ replace the old   │          │ function still   │   return OLD_API_KEY │
+│    │ variable in the   │          │ returns the old  │                    │
+│    │ auth init         │          │ variable. The    │   ↳ This line      │
+│    │ function.         │          │ refactoring is   │ still uses the old │
+│    │                   │          │ incomplete.      │ variable name.     │
+└────┴───────────────────┴──────────┴──────────────────┴────────────────────┘
+
+╭───────────────────────────── Global Verdict ─────────────────────────────╮
+│ 1 satisfied  •  1 violated  •  0 uncertain                               │
+│ •  0 error(s)                                                            │
+│ ❌ 1 blocking issue(s) detected                                          │
+╰──────────────────────────────────────────────────────────────────────────╯
+```
+
 ---
 
 ## 🔗 CI/CD & Pre-commit Integration
@@ -125,7 +163,7 @@ repos:
     hooks:
     -   id: intentcheck
 ```
-*⚠️ Note: You must have `GROQ_API_KEY` exported in your terminal environment for the pre-commit hook to function.*
+* Note: You must have `GROQ_API_KEY` exported in your terminal environment for the pre-commit hook to function.*
 
 ---
 
@@ -160,7 +198,7 @@ intentcheck investigate --full-pipeline --provider anthropic --model claude-3-5-
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions make the open-source community an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
@@ -173,6 +211,6 @@ Contributions make the open-source community an amazing place to learn, inspire,
 
 ---
 
-## 📜 License
+##  License
 
 Distributed under the MIT License. See `LICENSE` for more information.

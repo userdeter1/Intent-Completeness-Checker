@@ -4,7 +4,7 @@ First off, thank you for considering contributing to the **Intent Completeness C
 
 This document provides guidelines and instructions for contributing to this project.
 
-## 🛠️ Development Setup
+##  Development Setup
 
 To set up the project locally for development:
 
@@ -40,7 +40,7 @@ To set up the project locally for development:
    cp .env.example .env
    ```
 
-## 🧪 Running Tests
+##  Running Tests
 
 We use `pytest` for unit testing. Before submitting a Pull Request, please ensure all tests pass:
 
@@ -48,7 +48,7 @@ We use `pytest` for unit testing. Before submitting a Pull Request, please ensur
 pytest
 ```
 
-## 🧹 Code Quality and Linting
+##  Code Quality and Linting
 
 We strictly use `ruff` for fast linting and formatting.
 
@@ -63,7 +63,7 @@ We strictly use `ruff` for fast linting and formatting.
 
 *Note: If you installed `pre-commit`, Ruff will run automatically when you try to commit.*
 
-## 🚀 Submitting a Pull Request (PR)
+##  Submitting a Pull Request (PR)
 
 1. **Fork the repository** and create your branch from `main`.
 2. **Make your changes** (ensure they are atomic and well-documented).
@@ -71,7 +71,7 @@ We strictly use `ruff` for fast linting and formatting.
 4. **Commit your changes**. Our AI pre-commit hook will also verify if your intent is fully covered!
 5. **Push to your fork** and submit a PR to the `main` branch of this repository.
 
-## 🐛 Reporting Bugs
+##  Reporting Bugs
 
 If you find a bug, please create an issue providing as much detail as possible, including:
 - Steps to reproduce the issue.
