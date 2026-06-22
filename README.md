@@ -6,7 +6,7 @@
 
   <h1>Intent Completeness Checker</h1>
   <p>
-    <b>A Multi-Agent AI Pipeline for Code Verification (Powered by <a href="https://github.com/agno-ai/agno">Agno Framework</a>)</b><br />
+    <b>A Multi-Agent AI Pipeline for Code Verification (Powered by <a href="https://www.agno.com/">Agno Framework</a>)</b><br />
     Ensure your AI coding assistants finish what they started. No more half-finished refactors.
   </p>
 </div>
