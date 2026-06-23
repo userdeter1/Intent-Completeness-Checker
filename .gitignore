@@ -81,3 +81,12 @@ agno_storage/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Website (Next.js)
+website/node_modules/
+website/.next/
+website/out/
+website/build/
+website/.env*
+website/*.tsbuildinfo
+website/next-env.d.ts
